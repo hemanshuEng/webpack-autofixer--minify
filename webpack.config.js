@@ -1,13 +1,19 @@
 const path = require("path");
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 module.exports = {
   entry: "./src/js/index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
     // publicPath: "/dist",
     filename: "bundle.js"
+  },
+  optimization: {
+    minimizer: [new OptimizeCssAssetsPlugin(), new TerserPlugin()]
   },
   module: {
     rules: [
@@ -26,8 +32,8 @@ module.exports = {
         use: [
           MiniCssExtractPlugin.loader,
           { loader: "css-loader", options: { importLoaders: 1 } },
+          "postcss-loader",
           "sass-loader",
-          "postcss-loader"
         ]
       },
       {
@@ -50,6 +56,10 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery"
+    }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
@@ -59,6 +69,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "src/index.html"
     }),
+
     new CleanWebpackPlugin()
   ]
 };
